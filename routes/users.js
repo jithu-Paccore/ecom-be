@@ -8,25 +8,42 @@ router.get("/", function (req, res, next) {
 });
 
 router.post("/register", async (req, res) => {
-  let user = new User({
-    name: req.body.name,
-    email: req.body.name,
-    phone: req.body.phone,
-    age: req.body.age,
-    gender: req.body.gender,
+  User.findOne({ phone: req.body.phone }).then((savedUser) => {
+    if (savedUser) {
+      return res
+        .status(422)
+        .json({ error: "user already exists with that phone" });
+    } else {
+      let user = new User({
+        name: req.body.name,
+        email: req.body.name,
+        phone: req.body.phone,
+        age: req.body.age,
+        gender: req.body.gender,
+      });
+      var reqOtp = "1234";
+      if (req.body.otp === reqOtp) {
+        user
+          .save()
+          .then((user) => {
+            return res.json({ message: "saved successfully" });
+          })
+          .catch((err) => {
+            console.log(err);
+            return res.json({ error: err });
+          });
+      } else {
+        return res.status(400).send("invalid otp");
+      }
+      if (!user) {
+        return res.status(400).send("the user cannot be created!");
+      } else {
+        return res.status(200).send(user);
+      }
+    }
   });
-  var reqOtp = "1234";
-  if (req.body.otp === reqOtp) {
-    user = await user.save();
-  }
 
-  if (!user) {
-    return res.status(400).send("the user cannot be created!");
-  } else {
-    return res.status(200).send(user);
-  }
-
-  console.log(user);
+  // console.log(user);
 });
 
 router.post("/login", async (req, res) => {
