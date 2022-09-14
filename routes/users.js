@@ -33,7 +33,9 @@ router.post("/register", async (req, res) => {
             return res.json({ error: err });
           });
       } else {
-        return res.status(400).send("invalid otp");
+        return res.status(400)
+        return res.send("invalid otp");
+
       }
       if (!user) {
         return res.status(400).send("the user cannot be created!");
