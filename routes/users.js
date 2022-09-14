@@ -26,7 +26,7 @@ router.post("/register", async (req, res) => {
         user
           .save()
           .then((user) => {
-            return res.json({ message: "saved successfully" });
+            return res.json({ message: "saved successfully" }).send(user);
           })
           .catch((err) => {
             console.log(err);
@@ -35,12 +35,6 @@ router.post("/register", async (req, res) => {
       } else {
         return res.status(400)
         return res.send("invalid otp");
-
-      }
-      if (!user) {
-        return res.status(400).send("the user cannot be created!");
-      } else {
-        return res.status(200).send(user);
       }
     }
   });
