@@ -17,7 +17,7 @@ router.get("/getProduct", requireLogin, async (req, res) => {
   return res.send(productList);
 });
 
-router.get("/getFilterProduct", requireLogin, async (req, res) => {
+router.post("/getFilterProduct", requireLogin, async (req, res) => {
   let query = [];
   let gender = req.body.gender;
   let categoryCode = req.body.categoryCode;
