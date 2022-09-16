@@ -14,18 +14,20 @@ router.post("/addtocart", requireLogin, async (req, res) => {
 
   let jquery = [
     { itemId: req.body.itemId },
-    { count: !req.body.count },
+    { count : !req.body.count },
     { cartBelongsTo: req.user._id },
   ];
 
   var xquery = [{ itemId: req.body.itemId }, { cartBelongsTo: req.user._id }];
 
-  let ralid = Cart.find({
+  let ralid = await Cart.find({
     $and: query,
   });
   let valid = await Cart.find({
     $and: jquery,
   });
+
+  console.log("valid", valid);
 
   if (ralid.length > 0) {
     return res.send(
