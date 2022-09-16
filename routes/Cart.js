@@ -15,6 +15,7 @@ router.post("/addtocart", requireLogin, async (req, res) => {
     brand: req.body.brand,
     forGender: req.body.gender,
     count: req.body.count,
+    sumPrice : req.body.sumPrice,
     cartBelongsTo: req.user._id,
   });
 
