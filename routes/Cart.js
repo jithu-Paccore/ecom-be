@@ -6,26 +6,43 @@ const requireLogin = require("../middleWare/requireLogin");
 const { route } = require("./Cart");
 
 router.post("/addtocart", requireLogin, async (req, res) => {
-  let cart = new Cart({
-    name: req.body.name,
-    description: req.body.description,
-    price: req.body.price,
-    categoryCode: req.body.catCode,
-    size: req.body.size,
-    brand: req.body.brand,
-    forGender: req.body.gender,
-    count: req.body.count,
-    sumPrice : req.body.sumPrice,
-    cartBelongsTo: req.user._id,
+  let query = [
+    { itemId: req.body.itemId },
+    { count: req.body.count },
+    { cartBelongsTo: req.user._id },
+  ];
+  Cart.find({
+    $and: query,
+  }).then(async (dupliacteItem) => {
+    console.log("dfghjklo", dupliacteItem);
+    if (dupliacteItem.length > 0) {
+      return res.send(
+        "item already in the cart, You can add more my increasing the count"
+      );
+    } else {
+      let cart = new Cart({
+        itemId: req.body.itemId,
+        name: req.body.name,
+        description: req.body.description,
+        price: req.body.price,
+        categoryCode: req.body.catCode,
+        size: req.body.size,
+        brand: req.body.brand,
+        forGender: req.body.gender,
+        count: req.body.count,
+        sumPrice: req.body.sumPrice,
+        cartBelongsTo: req.user._id,
+      });
+
+      cart = await cart.save();
+
+      if (!cart) {
+        return res.status(500).send("The cart is not updated");
+      } else {
+        return res.send(cart) && console.log("added cart", cart);
+      }
+    }
   });
-
-  cart = await cart.save();
-
-  if (!cart) {
-    return res.status(500).send("The cart is not updated");
-  } else {
-    return res.send(cart);
-  }
 });
 
 router.get("/getCartItems", requireLogin, async (req, res) => {
@@ -75,8 +92,8 @@ router.put("/increasecount", requireLogin, async (req, res) => {
 router.put("/decreasecount", requireLogin, async (req, res) => {
   Cart.findByIdAndUpdate(req.body.itemId, {
     $inc: {
-        count: -1,
-      },
+      count: -1,
+    },
   })
     .then((result) => {
       res.json(result);

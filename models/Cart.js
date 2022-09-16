@@ -44,6 +44,10 @@ const cartSchema = mongoose.Schema({
   sumPrice: {
     type: Number,
   },
+  itemId: {
+    type: String,
+    require: true,
+  },
 });
 
 exports.Cart = mongoose.model("Cart", cartSchema);
