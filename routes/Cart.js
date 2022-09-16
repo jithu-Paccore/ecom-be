@@ -16,9 +16,10 @@ router.post("/addtocart", requireLogin, async (req, res) => {
   }).then(async (dupliacteItem) => {
     console.log("dfghjklo", dupliacteItem);
     if (dupliacteItem.length > 0) {
-      return res.send(
-        "item already in the cart, You can add more my increasing the count"
-      );
+      return res.send({
+        message:
+          "item already in the cart, You can add more my increasing the count",
+      });
     } else {
       let cart = new Cart({
         itemId: req.body.itemId,
@@ -37,7 +38,7 @@ router.post("/addtocart", requireLogin, async (req, res) => {
       cart = await cart.save();
 
       if (!cart) {
-        return res.status(500).send({ message: "The cart is not updated" });
+        return res.status(500).send("The cart is not updated");
       } else {
         return res.send(cart) && console.log("added cart", cart);
       }
