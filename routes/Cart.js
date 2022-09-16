@@ -37,7 +37,7 @@ router.post("/addtocart", requireLogin, async (req, res) => {
       cart = await cart.save();
 
       if (!cart) {
-        return res.status(500).send("The cart is not updated");
+        return res.status(500).send({ message: "The cart is not updated" });
       } else {
         return res.send(cart) && console.log("added cart", cart);
       }
