@@ -11,68 +11,62 @@ router.post("/addtocart", requireLogin, async (req, res) => {
     { count: req.body.count },
     { cartBelongsTo: req.user._id },
   ];
-  Cart.find({
+
+  let jquery = [
+    { itemId: req.body.itemId },
+    { count: !req.body.count },
+    { cartBelongsTo: req.user._id },
+  ];
+
+  var xquery = [{ itemId: req.body.itemId }, { cartBelongsTo: req.user._id }];
+
+  let ralid = Cart.find({
     $and: query,
-  }).then(async (dupliacteItem) => {
-    console.log("dfghjklo", dupliacteItem);
-    if (dupliacteItem.length > 0) {
-      return res.send(
-        "item already in the cart, You can add more my increasing the count"
-      );
-    } else {
-      let jquery = [
-        { itemId: req.body.itemId },
-        { count: !req.body.count },
-        { cartBelongsTo: req.user._id },
-      ];
-
-      var xquery = [
-        { itemId: req.body.itemId },
-        { cartBelongsTo: req.user._id },
-      ];
-
-      let valid = await Cart.find({
-        $and: jquery,
-      });
-
-      if (valid.length > 0) {
-        Cart.findByIdAndUpdate(
-          { $and: xquery },
-          {
-            count: req.body.count,
-          }
-        )
-          .then((result) => {
-            res.json(result);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      } else {
-        let cart = new Cart({
-          itemId: req.body.itemId,
-          name: req.body.name,
-          description: req.body.description,
-          price: req.body.price,
-          categoryCode: req.body.catCode,
-          size: req.body.size,
-          brand: req.body.brand,
-          forGender: req.body.gender,
-          count: req.body.count,
-          sumPrice: req.body.sumPrice,
-          cartBelongsTo: req.user._id,
-        });
-
-        cart = await cart.save();
-
-        if (!cart) {
-          return res.status(500).send("The cart is not updated");
-        } else {
-          return res.send(cart) && console.log("added cart", cart);
-        }
-      }
-    }
   });
+  let valid = await Cart.find({
+    $and: jquery,
+  });
+
+  if (ralid.length > 0) {
+    return res.send(
+      "item already in the cart, You can add more my increasing the count"
+    );
+  } else if (valid.length > 0) {
+    Cart.findByIdAndUpdate(
+      { $and: xquery },
+      {
+        count: req.body.count,
+      }
+    )
+      .then((result) => {
+        res.json(result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    let cart = new Cart({
+      itemId: req.body.itemId,
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      categoryCode: req.body.catCode,
+      size: req.body.size,
+      brand: req.body.brand,
+      forGender: req.body.gender,
+      count: req.body.count,
+      sumPrice: req.body.sumPrice,
+      cartBelongsTo: req.user._id,
+    });
+
+    cart = await cart.save();
+
+    if (!cart) {
+      return res.status(500).send("The cart is not updated");
+    } else {
+      return res.send(cart) && console.log("added cart", cart);
+    }
+  }
 });
 
 router.get("/getCartItems", requireLogin, async (req, res) => {
