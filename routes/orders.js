@@ -1,4 +1,5 @@
 const { Orders } = require("../models/orders");
+const { Cart } = require("../models/orders");
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
@@ -28,6 +29,16 @@ router.post("/placeOrder", requireLogin, async (req, res) => {
       res.send(err);
       console.log("error", err);
     });
+
+  Cart.find({ orderedBy: req.user._id }).exec((err, Cart) => {
+    Cart?.remove()
+      .then((result) => {
+        res.json(result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
 });
 
 router.get("/getOrders", requireLogin, async (req, res) => {
