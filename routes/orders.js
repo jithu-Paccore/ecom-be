@@ -12,7 +12,6 @@ var date =
   today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
 
 router.post("/placeOrder", requireLogin, async (req, res) => {
-  console.log("dfghjkl");
   let order = new Orders({
     orders: req.body.orders,
     orderedBy: req.user._id,
