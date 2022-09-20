@@ -1,4 +1,5 @@
 const { Orders } = require("../models/orders");
+const { Cart } = require("../models/Cart");
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
@@ -23,6 +24,18 @@ router.post("/placeOrder", requireLogin, async (req, res) => {
     .then((result) => {
       res.send(result);
       console.log("errorr", result);
+
+      let car = Cart;
+
+      if (car.length > 0) {
+        Cart.deleteMany({ cartBelongsTo: req.user._id })
+          .then((result) => {
+            console.log("cart deleted");
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
     })
     .catch((err) => {
       res.send(err);
