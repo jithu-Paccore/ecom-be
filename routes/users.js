@@ -33,8 +33,8 @@ router.post("/register", async (req, res) => {
             return res.json({ error: err });
           });
       } else {
-        return res.status(400)
-        return res.send("invalid otp");
+        return res.status(400).json({ message: "invalid otp" });
+       
       }
     }
   });

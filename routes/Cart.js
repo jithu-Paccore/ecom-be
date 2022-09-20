@@ -14,17 +14,17 @@ router.post("/addtocart", requireLogin, async (req, res) => {
 
   let jquery = [
     { itemId: req.body.itemId },
-    { count : !req.body.count },
+    { count: { $ne: req.body.count } },
     { cartBelongsTo: req.user._id },
   ];
 
+  let valid = await Cart.find({
+    $and: jquery,
+  });
   var xquery = [{ itemId: req.body.itemId }, { cartBelongsTo: req.user._id }];
 
   let ralid = await Cart.find({
     $and: query,
-  });
-  let valid = await Cart.find({
-    $and: jquery,
   });
 
   console.log("valid", valid);
@@ -34,17 +34,20 @@ router.post("/addtocart", requireLogin, async (req, res) => {
       "item already in the cart, You can add more my increasing the count"
     );
   } else if (valid.length > 0) {
-    Cart.findByIdAndUpdate(
+    console.log("count ---");
+    Cart.updateOne(
       { $and: xquery },
       {
-        count: req.body.count,
+        $set: {
+          count: req.body.count,
+        },
       }
     )
       .then((result) => {
-        res.json(result);
+        return res.json(result);
       })
       .catch((err) => {
-        console.log(err);
+        res.send(err);
       });
   } else {
     let cart = new Cart({
@@ -85,47 +88,63 @@ router.get("/getCartItems", requireLogin, async (req, res) => {
   return res.send(cartList);
 });
 
-router.delete("/deleteItem", requireLogin, async (req, res) => {
+router.post("/deleteItem", requireLogin, async (req, res) => {
   let car = Cart;
+  console.log("asdf", req.body.itemId);
 
-  if (car) {
+  if (car.length > 0) {
     Cart.findOne({ itemId: req.body.itemId }).exec((err, Cart) => {
-      Cart.remove()
+      Cart?.remove()
         .then((result) => {
-          res.json(result);
+          return res.json(result);
         })
         .catch((err) => {
-          console.log(err);
+          return res.send(err);
         });
     });
   }
 });
 
-router.put("/increasecount", requireLogin, async (req, res) => {
+router.post("/deleteallcart", requireLogin, async (req, res) => {
+  console.log("ggg", req.user._id);
+  let car = Cart;
+
+  if (car.length > 0) {
+    Cart.deleteMany({ cartBelongsTo: req.user._id })
+      .then((result) => {
+        return res.send(result);
+      })
+      .catch((err) => {
+        return res.send(err);
+      });
+  }
+});
+
+router.post("/increasecount", requireLogin, async (req, res) => {
   Cart.findByIdAndUpdate(req.body.itemId, {
     $inc: {
       count: 1,
     },
   })
     .then((result) => {
-      res.json(result);
+      return res.json(result);
     })
     .catch((err) => {
-      console.log(err);
+      return res.send(err);
     });
 });
 
-router.put("/decreasecount", requireLogin, async (req, res) => {
+router.post("/decreasecount", requireLogin, async (req, res) => {
   Cart.findByIdAndUpdate(req.body.itemId, {
     $inc: {
       count: -1,
     },
   })
     .then((result) => {
-      res.json(result);
+      return res.json(result);
     })
     .catch((err) => {
-      console.log(err);
+      return res.send(err);
     });
 });
 

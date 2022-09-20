@@ -12,6 +12,7 @@ var date =
   today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
 
 router.post("/placeOrder", requireLogin, async (req, res) => {
+  console.log("dfghjkl");
   let order = new Orders({
     orders: req.body.orders,
     orderedBy: req.user._id,
@@ -22,7 +23,7 @@ router.post("/placeOrder", requireLogin, async (req, res) => {
   order
     .save()
     .then((result) => {
-      res.send(result);
+      return res.send(result);
       console.log("errorr", result);
 
       let car = Cart;
@@ -30,15 +31,15 @@ router.post("/placeOrder", requireLogin, async (req, res) => {
       if (car.length > 0) {
         Cart.deleteMany({ cartBelongsTo: req.user._id })
           .then((result) => {
-            console.log("cart deleted");
+            return console.log("cart deleted");
           })
           .catch((err) => {
-            console.log(err);
+            return console.log(err);
           });
       }
     })
     .catch((err) => {
-      res.send(err);
+      return res.send(err);
       console.log("error", err);
     });
 });
