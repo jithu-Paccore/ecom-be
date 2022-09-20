@@ -23,7 +23,7 @@ router.post("/placeOrder", requireLogin, async (req, res) => {
   order
     .save()
     .then((result) => {
-      return res.send(result);
+      res.send(result);
       console.log("errorr", result);
 
       let car = Cart;
@@ -31,15 +31,15 @@ router.post("/placeOrder", requireLogin, async (req, res) => {
       if (car.length > 0) {
         Cart.deleteMany({ cartBelongsTo: req.user._id })
           .then((result) => {
-            return console.log("cart deleted");
+            console.log("cart deleted");
           })
           .catch((err) => {
-            return console.log(err);
+            console.log(err);
           });
       }
     })
     .catch((err) => {
-      return res.send(err);
+      res.send(err);
       console.log("error", err);
     });
 });
