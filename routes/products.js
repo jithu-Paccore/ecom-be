@@ -38,10 +38,12 @@ router.post("/getFilterProduct", requireLogin, async (req, res) => {
   console.log("query", query);
   let prod = Product;
   let productList = [];
-  if (prod) {
+  if (prod && query.length > 0) {
     productList = await Product.find({
       $and: query,
     });
+  } else if (prod) {
+    productList = await Product.find()
   }
 
   if (!productList) {
