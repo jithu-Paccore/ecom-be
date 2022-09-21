@@ -121,9 +121,12 @@ router.post("/deleteallcart", requireLogin, async (req, res) => {
 });
 
 router.post("/increasecount", requireLogin, async (req, res) => {
+  var increament = req.body.price;
+  console.log("huiii", req.body.price);
   Cart.findByIdAndUpdate(req.body.itemId, {
     $inc: {
       count: 1,
+      sumPrice: increament,
     },
   })
     .then((result) => {
@@ -135,9 +138,11 @@ router.post("/increasecount", requireLogin, async (req, res) => {
 });
 
 router.post("/decreasecount", requireLogin, async (req, res) => {
+  var increament = req.body.price;
   Cart.findByIdAndUpdate(req.body.itemId, {
     $inc: {
       count: -1,
+      sumPrice: -increament,
     },
   })
     .then((result) => {
