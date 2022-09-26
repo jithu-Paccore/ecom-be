@@ -88,6 +88,25 @@ router.get("/getCartItems", requireLogin, async (req, res) => {
   return res.send(cartList);
 });
 
+router.get("/getCartItemsPrice", requireLogin, async (req, res) => {
+  let car = Cart;
+  let cartList = [];
+
+  if (car) {
+    cartList = await Cart.find({ cartBelongsTo: req.user.id });
+  }
+
+  var sum = 0;
+  cartList?.forEach((item) => {
+    return (sum += item.sumPrice);
+  });
+
+  if (!cartList) {
+    return res.status(500).send({ success: false });
+  }
+  return res.send({ subtotal: sum });
+});
+
 router.post("/deleteItem", requireLogin, async (req, res) => {
   let car = Cart;
   console.log("asdf", req.body.itemId);
