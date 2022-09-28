@@ -208,7 +208,7 @@ router.post("/register", async (req, res) => {
                   console.log(err);
                 });
 
-              return res.send({ message: "saved successfully" }).send(user);
+              return res.send(user);
             })
             .catch((err) => {
               console.log(err);
