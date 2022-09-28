@@ -208,11 +208,11 @@ router.post("/register", async (req, res) => {
                   console.log(err);
                 });
 
-              return res.json({ message: "saved successfully" }).send(user);
+              return res.send({ message: "saved successfully" }).send(user);
             })
             .catch((err) => {
               console.log(err);
-              return res.json({ error: err });
+              return res.send({ error: err });
             });
         } else {
           return res.status(400).json({ message: "invalid otp" });
