@@ -176,49 +176,53 @@ router.post("/register", async (req, res) => {
         age: req.body.age,
         gender: req.body.gender,
       });
-      const otpRecords = await Otp.find({
+      Otp.find({
         userId: req.body.mail,
-      });
+      })
+        .then((otpRecords) => {
+          console.log(otpRecords);
+          const { expiresIn } = otpRecords[0];
+          const reqOtp = otpRecords[0].otp;
 
-      console.log(otpRecords);
-      const { expiresIn } = otpRecords[0];
-      const reqOtp = otpRecords[0].otp;
+          if (expiresIn < Date.now()) {
+            Otp?.deleteMany({ userId: req.body.mail })
+              .then((result) => {
+                console.log(result);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
 
-      if (expiresIn < Date.now()) {
-        Otp?.deleteMany({ userId: req.body.mail })
-          .then((result) => {
-            console.log(result);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+            return res.send({
+              message: "otp expired , please request for another otp",
+            });
+          } else {
+            if (req.body.otp === reqOtp) {
+              user
+                .save()
+                .then((user) => {
+                  Otp?.deleteMany({ userId: req.body.mail })
+                    .then((result) => {
+                      console.log(result);
+                    })
+                    .catch((err) => {
+                      console.log(err);
+                    });
 
-        return res.send({
-          message: "otp expired , please request for another otp",
-        });
-      } else {
-        if (req.body.otp === reqOtp) {
-          user
-            .save()
-            .then((user) => {
-              Otp?.deleteMany({ userId: req.body.mail })
-                .then((result) => {
-                  console.log(result);
+                  return res.send(user);
                 })
                 .catch((err) => {
                   console.log(err);
+                  return res.send({ error: err });
                 });
-
-              return res.send(user);
-            })
-            .catch((err) => {
-              console.log(err);
-              return res.send({ error: err });
-            });
-        } else {
-          return res.status(400).json({ message: "invalid otp" });
-        }
-      }
+            } else {
+              return res.status(400).json({ message: "invalid otp" });
+            }
+          }
+        })
+        .catch((err) => {
+          res.send("resend otp");
+        });
     }
   });
 
