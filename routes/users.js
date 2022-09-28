@@ -180,6 +180,7 @@ router.post("/register", async (req, res) => {
         userId: req.body.mail,
       });
 
+      console.log(otpRecords);
       const { expiresIn } = otpRecords[0];
       const reqOtp = otpRecords[0].otp;
 
