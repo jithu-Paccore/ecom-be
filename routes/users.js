@@ -74,49 +74,57 @@ router.post("/sendOtp", async (req, res) => {
 });
 
 router.post("/sendRegisterOtp", async (req, res) => {
-  var otp = `${Math.floor(1000 + Math.random() * 9000)}`;
-
-  Otp?.deleteMany({ userId: req.body.mail })
-    .then((result) => {
-      console.log(result);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
-  let transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: "soruteaser88@gmail.com", //
-      pass: "gaemeqjvwsabkxoc", //
-    },
-  });
-
-  var mailOptions = {
-    from: "soruteaser88@gmail.com",
-    to: req.body.mail,
-    subject: "hiii",
-    text: "here is your otp" + otp,
-  };
-
-  let otpDb = new Otp({
-    userId: req.body.mail,
-    otp: otp,
-    createdAt: new Date(),
-    expiresIn: Date.now() + 60000,
-  });
-
-  otpDb.save();
-
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
+  User.findOne({ email: req.body.mail }).then(async (savedUser) => {
+    if (savedUser) {
+      return res
+        .status(422)
+        .json({ error: "user already exists with that phone" });
     } else {
-      console.log("Email sent: " + info.response);
+      var otp = `${Math.floor(1000 + Math.random() * 9000)}`;
+
+      Otp?.deleteMany({ userId: req.body.mail })
+        .then((result) => {
+          console.log(result);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      let transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "soruteaser88@gmail.com", //
+          pass: "gaemeqjvwsabkxoc", //
+        },
+      });
+
+      var mailOptions = {
+        from: "soruteaser88@gmail.com",
+        to: req.body.mail,
+        subject: "hiii",
+        text: "here is your otp" + otp,
+      };
+
+      let otpDb = new Otp({
+        userId: req.body.mail,
+        otp: otp,
+        createdAt: new Date(),
+        expiresIn: Date.now() + 60000,
+      });
+
+      otpDb.save();
+
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Email sent: " + info.response);
+        }
+      });
+
+      return res.send({ message: "otp sent" });
     }
   });
-
-  return res.send({ message: "otp sent" });
 });
 
 router.post("/verifyOtp", async (req, res) => {
